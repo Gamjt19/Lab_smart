@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Records</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container" id="attendanceContainer">
+       
+        <h1>Attendance Records</h1>
+        <form id="filterForm">
+            <div>
+            <label for="studentId">Student ID:</label>
+            <input type="text" id="studentId" name="studentId" placeholder="Enter student ID">
+        </div>
+        <div>
+            <label for="startDate">Start Date:</label>
+            <input type="datetime-local" id="startDate" name="startDate">
+        </div>    
+        <div>
+            <label for="endDate">End Date:</label>
+            <input type="datetime-local" id="endDate" name="endDate">
+        </div>   
+            <button type="submit">Filter</button>
+        </form>
+        <div class="attentab">
+        <table id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Student ID</th>
+                    <th>Punch In Time</th>
+                    <th>Punch Out Time</th>
+                    <th>Duration</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                <!-- Records will be populated here -->
+            </tbody>
+        </table>
+        </div>
+    </div>
+    <script src="attendanceScript.js"></script>
+</body>
+</html>
