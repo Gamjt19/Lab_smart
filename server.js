@@ -6,6 +6,25 @@ const { MongoClient } = require('mongodb'); // Import MongoDB client
 const app = express();
 const PORT = 3002; // Updated port
 
+// Middleware to check if IP is allowed
+const allowedIPs = ['::1', '127.0.0.1', '192.168.1.101']; // Add lab IPs here
+
+function checkLabIP(req, res, next) {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
+    console.log("Incoming IP:", ip);
+
+    const cleanIP = ip.replace('::ffff:', '');
+
+    if (allowedIPs.includes(cleanIP) || allowedIPs.includes(ip)) {
+        return next(); // IP allowed
+    }
+
+    return res.status(403).json({ message: 'Access Denied: IP not whitelisted', ip: cleanIP });
+}
+
+
+
+
 app.use(cors());
 app.use(express.json()); // Middleware to parse JSON requests
 
@@ -78,7 +97,7 @@ connectToMongoDB();
 
 
 // Verification endpoint
-app.get('/verify/:id', async (req, res) => {
+app.get('/verify/:id',checkLabIP, async (req, res) => {
     const studentId = req.params.id;
     try {
         const student = await db.collection('students').findOne({ student_id: studentId });
@@ -152,7 +171,7 @@ app.get('/', (req, res) => {
 });
 
 // Punch-in endpoint
-app.post('/punch-in/:studentId', async (req, res) => {
+app.post('/punch-in/:studentId', checkLabIP, async (req, res) => {
     const studentId = req.params.studentId;
     const istDate = new Date(); 
     console.log('Punch-in timestamp:', istDate);
@@ -180,7 +199,7 @@ app.post('/punch-in/:studentId', async (req, res) => {
 });
 
 // Punch-out endpoint
-app.post('/punch-out/:studentId', async (req, res) => {
+app.post('/punch-out/:studentId',checkLabIP, async (req, res) => {
     const studentId = req.params.studentId;
     const istDate = new Date(); 
     console.log('Punch-out timestamp:', istDate);
@@ -205,8 +224,6 @@ app.post('/punch-out/:studentId', async (req, res) => {
         res.status(500).json({ message: 'Error punching out', error });
     }
 });
-
-
 
 // Start the server
 app.listen(PORT, () => {
