@@ -33,9 +33,7 @@ function populateTable(records) {
 
 records.sort((a, b) => new Date(b.punch_in_time) - new Date(a.punch_in_time)); // Sort records by punch-in time descending
 records.forEach(record => {
-
-        if (!addedStudentIds.has(record.student_id)) { // Check for duplicates
-            addedStudentIds.add(record.student_id); // Add to the set
+// Add to the set
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${record.student_name}</td>
@@ -45,7 +43,7 @@ records.forEach(record => {
                 <td>${calculateDuration(record.punch_in_time, record.punch_out_time)}</td>
             `;
             tbody.appendChild(row);
-        }
+        
     });
 }
 
@@ -96,6 +94,7 @@ document.querySelectorAll('#attendanceTable th').forEach(header => {
         sortTable(column);
     });
 });
+
 
 function sortTable(column) {
     const tbody = document.querySelector('#attendanceTable tbody');

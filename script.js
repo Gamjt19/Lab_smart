@@ -7,31 +7,41 @@ const punchInTimeElement = document.getElementById('punchInTime');
 const punchOutTimeElement = document.getElementById('punchOutTime');
 let studentId; // Declare studentId variable
 let punchedIn = false; // Track punch-in status
+let scanning = false;
+
 
 console.log('Attempting to start camera...'); // Debugging log
 
+
 // Function to start camera and scan QR code
 function startScanning() {
-    console.log('Accessing video camera...'); // Debugging log
-    // Access the video camera and start scanning
+    console.log('Accessing video camera...');
+    scanning = true;
+
     codeReader.decodeFromVideoDevice(null, videoElement, (result, error) => {
+        if (!scanning) return; // Prevent multiple scans
+
         if (result) {
             console.log(`QR Code detected: ${result.text}`);
-            verifyStudent(result.text); // Call the verification function
+            scanning = false;
+            codeReader.reset(); // 🚫 Stop camera + QR scanning
+            verifyStudent(result.text); // Proceed to verification
         }
+
         if (error) {
             if (error instanceof ZXing.NotFoundException) {
                 resultDiv.textContent = 'No QR Code found.';
             } else {
                 console.error('Error accessing camera:', error);
-                resultDiv.textContent = 'Error accessing camera: ' + error.message; // Improved error message
+                resultDiv.textContent = 'Error accessing camera: ' + error.message;
             }
         }
     });
-    
+
     // Disable mirror effect
     videoElement.style.transform = 'scaleX(-1)';
 }
+
 
 // Function to verify student with a backend check
 function verifyStudent(qrCodeUrl) {
@@ -51,12 +61,10 @@ function verifyStudent(qrCodeUrl) {
             if (data.message === "Student found") {
                 // Show dropdown notification
                 showNotification(`${studentId} successfully verified`);
-                setTimeout(() => {
                     punchInButton.style.display = 'block'; // Show punch-in button
                     punchOutButton.style.display = 'block'; // Show punch-out button
-                    resultDiv.textContent = 'Verification complete!'; // Update message
+                    resultDiv.textContent = `${data.name} Verification complete!` ; // Update message
                     videoElement.style.pointerEvents = 'auto'; // Re-enable interactions
-                }); 
             } else {
                 punchInButton.style.display = 'none'; // Hide buttons if not found
                 punchOutButton.style.display = 'none';
